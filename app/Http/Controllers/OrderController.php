@@ -9,7 +9,7 @@ class OrderController extends Controller
 {
     public function store(Request $request)
     {
-        // Валидация данных формы
+
         $validated = $request->validate([
             'surname' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -22,11 +22,11 @@ class OrderController extends Controller
             'home' => 'required_if:delivery_method,courier|string|max:10',
         ]);
 
-        // Расчет полной стоимости заказа
+
         $totalPrice = $this->calculateTotalPrice($request);
 
         try {
-            // Создание заказа в базе данных
+
             $order = Order::create([
                 'surname' => $request->surname,
                 'name' => $request->name,
@@ -43,25 +43,25 @@ class OrderController extends Controller
                 'total_price' => $totalPrice,
             ]);
 
-            // Проверка сохранения данных
+
            // dd('Order created successfully', $order);
 
         } catch (\Exception $e) {
-            // Если произошла ошибка при сохранении, возвращаем на форму с сообщением об ошибке и описанием исключения
+
             return back()->with('status', 'Order not saved due to database error: ' . $e->getMessage());
         }
 
-        // Перенаправление на страницу успешного оформления, если все прошло успешно
+
         return redirect()->route('order.success');
     }
 
     private function calculateTotalPrice(Request $request)
     {
         $basePrice = 2000;
-        $deliveryCost = config('shop.delivery_cost', 280); // Стоимость доставки
-        $minFreeDelivery = config('shop.min_order_price_for_free_delivery', 2000); // Порог бесплатной доставки
+        $deliveryCost = config('shop.delivery_cost', 280);
+        $minFreeDelivery = config('shop.min_order_price_for_free_delivery', 2000);
 
-        // Логика добавления доставки к цене, если не достигнут минимум для бесплатной доставки
+
         return ($request->delivery_method === 'courier' && $basePrice < $minFreeDelivery)
             ? $basePrice + $deliveryCost
             : $basePrice;
