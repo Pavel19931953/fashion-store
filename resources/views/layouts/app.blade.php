@@ -1,4 +1,5 @@
 <!-- resources/views/layouts/app.blade.php -->
+<!-- resources/views/layouts/app.blade.php -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -27,13 +28,30 @@
     <script src="{{ asset('assets/js/scripts.js') }}" defer></script>
 </head>
 <body>
-@include('partials.header') <!-- Включение хедера -->
 
+<!-- Подключение хедера -->
+@include('partials.header')
+
+<!-- Основной контент -->
 <main class="container">
-    @yield('content') <!-- Уникальный контент для каждой страницы -->
+    @yield('content')
 </main>
 
-@include('partials.footer') <!-- Включение футера -->
+<!-- Подключение футера -->
+@include('partials.footer')
+
+<!-- Блок для авторизованных пользователей -->
+@if(Auth::check())
+    <div class="admin-links">
+        @if(Auth::user()->role === 'admin')
+            <a href="{{ route('admin.dashboard') }}">Админ-панель</a>
+        @endif
+        <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+            @csrf
+            <button type="submit" class="btn btn-link">Выйти</button>
+        </form>
+    </div>
+@endif
 
 </body>
 </html>

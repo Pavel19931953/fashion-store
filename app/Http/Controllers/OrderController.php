@@ -9,6 +9,7 @@ class OrderController extends Controller
 {
     public function store(Request $request)
     {
+        //dd('Entering store method');
 
         $validated = $request->validate([
             'surname' => 'required|string|max:255',
@@ -21,7 +22,7 @@ class OrderController extends Controller
             'street' => 'required_if:delivery_method,courier|string|max:255',
             'home' => 'required_if:delivery_method,courier|string|max:10',
         ]);
-
+        //dd($validated);
 
         $totalPrice = $this->calculateTotalPrice($request);
 

@@ -12,7 +12,10 @@
                     <h1 class="intro__title">COATS</h1>
                     <p class="intro__info">Collection 2018</p>
                 </div>
+
+
             </header>
+
 
             <section class="shop container">
 
@@ -49,7 +52,7 @@
                             @foreach ($products as $product)
                                 <article class="shop__item product" tabindex="0">
                                     <div class="product__image">
-                                        <img src="{{ asset('assets/img/products/' . $product->image) }}" alt="{{ $product->name }}">
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                                     </div>
                                     <p class="product__name">{{ $product->name }}</p>
                                     <span class="product__price">{{ $product->price }} грн.</span>
@@ -176,6 +179,7 @@
             </section>
 
             <script>
+
                 document.querySelector('.js-order').addEventListener('submit', function(event) {
                     const requiredFields = ['surname', 'name', 'phone', 'email'];
                     let valid = true;
@@ -192,6 +196,7 @@
                         event.preventDefault();
                     }
                 });
+
             </script>
 
 

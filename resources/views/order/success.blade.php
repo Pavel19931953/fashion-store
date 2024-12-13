@@ -1,4 +1,4 @@
-
+<!-- resources/views/order/success.blade.php-->
 @extends('layouts.app')
 
 @section('title', 'Заказ оформлен')

@@ -11,6 +11,6 @@ use HasFactory;
     protected $fillable = [
         'surname', 'name', 'thirdName', 'phone', 'email',
         'delivery_method', 'city', 'street', 'home',
-        'apartment', 'payment_method', 'comment', 'total_price',
+        'apartment', 'payment_method', 'comment', 'total_price','status',
     ];
 }

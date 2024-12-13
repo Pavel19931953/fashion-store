@@ -1,48 +1,62 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return redirect()->route('catalog.index');
+})->name('home');
 
-// Главная страница редиректится на каталог
-// Группа маршрутов с использованием middleware `web`
-Route::middleware('web')->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('catalog.index');
-    })->name('home');
-
-    // Основная страница каталога
+// Группа маршрутов для основной части сайта
+Route::group([], function () {  // Заменили 'Route::group(function () {'
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
-
-    // Страница новинок
     Route::get('/catalog/novinki', [CatalogController::class, 'novinki'])->name('catalog.novinki');
-
-    // Страница распродажи
     Route::get('/catalog/rasprodazha', [CatalogController::class, 'rasprodazha'])->name('catalog.rasprodazha');
-
-    // Страница доставки
     Route::get('catalog/delivery', function () {
         return view('shop.delivery');
     })->name('catalog.delivery');
 
-    // Маршрут для создания заказа
     Route::post('catalog/order', [OrderController::class, 'store'])->name('order.store');
-
-    // Маршрут для успешного оформления заказа
     Route::get('/catalog/order/success', [OrderController::class, 'success'])->name('order.success');
+});
+
+
+
+
+// Маршруты авторизации для админского раздела
+Route::prefix('admin')->group(function () {
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('login', [AuthController::class, 'login']);
+
+    Route::middleware(['auth', 'admin'])->group(function () {
+        // Главная страница админки (список товаров)
+        Route::get('/', [ProductController::class, 'index'])->name('admin.dashboard');
+
+        // Маршруты для управления товарами
+        Route::prefix('products')->group(function () {
+            Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create'); // Добавление товара
+            Route::post('/', [ProductController::class, 'store'])->name('admin.products.store'); // Сохранение товара
+Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
+Route::post('/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+            Route::delete('/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy'); // Удаление товара
+        });
+    });
+});
+
+
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect()->route('admin.login');
+})->name('logout');
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index'); // Список заказов
+    Route::post('/orders/{order}/process', [AdminOrderController::class, 'process'])->name('admin.orders.process'); // Обработка заказа
 });
